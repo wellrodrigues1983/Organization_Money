@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "875177870089",
+    "project_id": "organizationmoney-e6e41",
+    "storage_bucket": "organizationmoney-e6e41.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875177870089:android:08fcd1b8f3a7f52ed609d8",
+        "android_client_info": {
+          "package_name": "com.wrsistemas.organizationmoney"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "875177870089-ttmla3303r4hubqfqnks774b7548iuhn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wrsistemas.organizationmoney",
+            "certificate_hash": "127096d1a248e1ca13592c4dab507da7422d3cb3"
+          }
+        },
+        {
+          "client_id": "875177870089-m13u0rk5m5mda7039t53kk37f0p5c3mv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB0g6bHi0Cnku12FEsdx8J6wIVQRLrnHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "875177870089-m13u0rk5m5mda7039t53kk37f0p5c3mv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

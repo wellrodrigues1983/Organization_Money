@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Organization & Money"
 include ':app'
+include ':library'
