@@ -1,4 +1,4 @@
-package com.wrsistemas.organizationmoney;
+package com.wrsistemas.organizationmoney.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,8 +6,7 @@ import android.view.View;
 
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide;
-import com.wrsistemas.organizationmoney.activity.CadastroActivity;
-import com.wrsistemas.organizationmoney.activity.LoginActivity;
+import com.wrsistemas.organizationmoney.R;
 
 public class MainActivity extends IntroActivity {
 
