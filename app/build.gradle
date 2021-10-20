@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:20.0.2'
     implementation 'com.google.firebase:firebase-auth:21.0.1'
     implementation project(':library')
+    implementation 'com.github.clans:fab:1.6.4'
 
 
 }

@@ -22,4 +22,22 @@
     <style name="Theme.OrganizationMoney.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.OrganizationMoney.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!--Tema aplicado nas despesas -->
+    <style name="despesaTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorPrimary">@color/colorPrimaryDespesas</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDarkDespesas</item>
+        <item name="android:colorAccent">@color/colorAccentDespesas</item>
+    </style>
+
+    <!--Tema aplicado nas receita -->
+    <style name="receitaTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorPrimary">@color/colorPrimaryReceita</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDarkReceita</item>
+        <item name="android:colorAccent">@color/colorAccentReceita</item>
+    </style>
 </resources>
