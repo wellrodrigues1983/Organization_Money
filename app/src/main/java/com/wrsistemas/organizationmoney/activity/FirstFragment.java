@@ -5,17 +5,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
+import androidx.annotation.ContentView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.wrsistemas.organizationmoney.R;
+import com.wrsistemas.organizationmoney.databinding.ActivityPrincipalBinding;
+import com.wrsistemas.organizationmoney.databinding.ContentPrincipalBinding;
 import com.wrsistemas.organizationmoney.databinding.FragmentFirstBinding;
 
 public class FirstFragment extends Fragment {
@@ -27,15 +35,15 @@ public class FirstFragment extends Fragment {
     private RecyclerView recyclerMovimentacao;
 
 
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
         binding = FragmentFirstBinding.inflate(inflater, container, false);
+
         return binding.getRoot();
-
-
 
 
     }
@@ -45,8 +53,18 @@ public class FirstFragment extends Fragment {
 
 
 
-      /*  toolbar = getView().findViewById(getActivity().);
-        toolbar.setTitle("Organization & Money");*/
+
+
+//        ((MainActivity) getActivity()).getSupportActionBar().setTitle("ActionBarName");
+
+
+        /*View actionBar;
+        actionBar = getView().findViewById(R.id.toolbar);
+        if (actionBar != null){
+            ((PrincipalActivity) getActivity()).getSupportActionBar().setTitle("teste");
+
+        }*/
+
 
         calendarView = getView().findViewById(R.id.calendarView);
         textoSaudacao = getView().findViewById(R.id.textSaudacao);
@@ -54,9 +72,6 @@ public class FirstFragment extends Fragment {
         recyclerMovimentacao = getView().findViewById(R.id.recyclerMovimentos);
 
         configuraCalendarView();
-
-
-
 
     }
 
@@ -82,5 +97,8 @@ public class FirstFragment extends Fragment {
             }
         });
     }
+
+
+
 
 }

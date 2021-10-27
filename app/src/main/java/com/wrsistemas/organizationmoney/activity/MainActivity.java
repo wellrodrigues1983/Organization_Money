@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,19 +20,15 @@ import com.wrsistemas.organizationmoney.model.Usuario;
 public class MainActivity extends IntroActivity {
 
     private FirebaseAuth autenticacao;
-
     private Usuario usuario;
-
-
+    private Toolbar tool;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
-
-
+        //setContentView(R.layout.activity_main); //Comentando essa linha faz com que o app não vá para a mainActivity no inicio
 
         setButtonBackVisible(false);
         setButtonNextVisible(false);
@@ -87,4 +84,9 @@ public class MainActivity extends IntroActivity {
     public void abrirTelaPrincipal(){
         startActivity(new Intent(this, PrincipalActivity.class));
     }
+
+
+
+
+
 }
