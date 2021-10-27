@@ -12,7 +12,7 @@
         <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/activity_despesas.xml" value="0.3546875" />
         <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/activity_login.xml" value="0.3546875" />
         <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/activity_main.xml" value="0.4" />
-        <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/activity_principal.xml" value="0.451552210724365" />
+        <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/activity_principal.xml" value="0.3806228373702422" />
         <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/activity_receitas.xml" value="0.3546875" />
         <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/content_principal.xml" value="0.3546875" />
         <entry key="..\:/Android_SDK/OrganizationMoney/app/src/main/res/layout/fragment_first.xml" value="0.4" />
@@ -26,7 +26,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
