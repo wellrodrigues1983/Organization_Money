@@ -24,7 +24,7 @@ public class PrincipalActivity extends AppCompatActivity {
 
     public AppBarConfiguration appBarConfiguration;
     private com.wrsistemas.organizationmoney.databinding.ActivityPrincipalBinding binding;
-    private FirebaseAuth autenticacao;
+    private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();;
 
 
 
@@ -41,7 +41,6 @@ public class PrincipalActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
         binding.toolbar.setTitle("");
-
 
     }
 
@@ -72,7 +71,6 @@ public class PrincipalActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.menuSair :
-                autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
                 autenticacao.signOut();
                 startActivity(new Intent(this, MainActivity.class));
                 finish();

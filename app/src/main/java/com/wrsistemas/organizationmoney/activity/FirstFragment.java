@@ -18,13 +18,23 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.wrsistemas.organizationmoney.R;
+import com.wrsistemas.organizationmoney.config.ConfiguracaoFirebase;
 import com.wrsistemas.organizationmoney.databinding.ActivityPrincipalBinding;
 import com.wrsistemas.organizationmoney.databinding.ContentPrincipalBinding;
 import com.wrsistemas.organizationmoney.databinding.FragmentFirstBinding;
+import com.wrsistemas.organizationmoney.helper.Base64Custon;
+import com.wrsistemas.organizationmoney.model.Usuario;
+
+import java.text.DecimalFormat;
 
 public class FirstFragment extends Fragment {
 
@@ -33,6 +43,12 @@ public class FirstFragment extends Fragment {
     private TextView textoSaudacao;
     private TextView textoSaldo;
     private RecyclerView recyclerMovimentacao;
+    private Double despesaTotal = 0.0;
+    private Double receitaTotal = 0.0;
+    private Double resumoUsuario = 0.0;
+
+    private DatabaseReference firebaseRef = ConfiguracaoFirebase.getFirebaseDatabase();
+    private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
 
 
@@ -44,27 +60,10 @@ public class FirstFragment extends Fragment {
         binding = FragmentFirstBinding.inflate(inflater, container, false);
 
         return binding.getRoot();
-
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-
-
-
-//        ((MainActivity) getActivity()).getSupportActionBar().setTitle("ActionBarName");
-
-
-        /*View actionBar;
-        actionBar = getView().findViewById(R.id.toolbar);
-        if (actionBar != null){
-            ((PrincipalActivity) getActivity()).getSupportActionBar().setTitle("teste");
-
-        }*/
-
 
         calendarView = getView().findViewById(R.id.calendarView);
         textoSaudacao = getView().findViewById(R.id.textSaudacao);
@@ -72,9 +71,9 @@ public class FirstFragment extends Fragment {
         recyclerMovimentacao = getView().findViewById(R.id.recyclerMovimentos);
 
         configuraCalendarView();
+        recuperarResumo();
 
     }
-
 
 
     @Override
@@ -92,7 +91,34 @@ public class FirstFragment extends Fragment {
             @Override
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
 
+            }
+        });
+    }
 
+    public void recuperarResumo(){
+        String emailUsuario = autenticacao.getCurrentUser().getEmail();
+        String idUsuario = Base64Custon.codificarBase64(emailUsuario);
+        DatabaseReference usuarioRef = firebaseRef.child("usuarios").child(idUsuario);
+
+        usuarioRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                Usuario usuario = snapshot.getValue(Usuario.class);
+
+                despesaTotal = usuario.getDespesaTotal();
+                receitaTotal = usuario.getReceitaTotal();
+                resumoUsuario = receitaTotal - despesaTotal;
+
+                DecimalFormat decimalFormat = new DecimalFormat("0.##");
+                String resultadoFormatado = decimalFormat.format(resumoUsuario);
+
+                textoSaudacao.setText("Olá, " + usuario.getNome());
+                textoSaldo.setText("R$ " + resultadoFormatado);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
