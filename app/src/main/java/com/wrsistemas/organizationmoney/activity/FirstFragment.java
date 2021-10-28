@@ -1,6 +1,7 @@
 package com.wrsistemas.organizationmoney.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,8 @@ public class FirstFragment extends Fragment {
 
     private DatabaseReference firebaseRef = ConfiguracaoFirebase.getFirebaseDatabase();
     private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+    private DatabaseReference usuarioRef;
+    private ValueEventListener valueEventListenerUsuario;
 
 
 
@@ -71,10 +74,15 @@ public class FirstFragment extends Fragment {
         recyclerMovimentacao = getView().findViewById(R.id.recyclerMovimentos);
 
         configuraCalendarView();
-        recuperarResumo();
+
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        recuperarResumo();
+    }
 
     @Override
     public void onDestroyView() {
@@ -98,9 +106,10 @@ public class FirstFragment extends Fragment {
     public void recuperarResumo(){
         String emailUsuario = autenticacao.getCurrentUser().getEmail();
         String idUsuario = Base64Custon.codificarBase64(emailUsuario);
-        DatabaseReference usuarioRef = firebaseRef.child("usuarios").child(idUsuario);
+        usuarioRef = firebaseRef.child("usuarios").child(idUsuario);
 
-        usuarioRef.addValueEventListener(new ValueEventListener() {
+        Log.i("Evento", "Evento foi adcionado");
+        valueEventListenerUsuario = usuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -124,7 +133,10 @@ public class FirstFragment extends Fragment {
         });
     }
 
-
-
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("Evento", "Evento foi removido");
+        usuarioRef.removeEventListener(valueEventListenerUsuario);
+    }
 }
