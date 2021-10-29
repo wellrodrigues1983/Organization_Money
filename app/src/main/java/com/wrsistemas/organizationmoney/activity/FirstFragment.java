@@ -17,6 +17,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,14 +29,18 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.wrsistemas.organizationmoney.R;
+import com.wrsistemas.organizationmoney.adapter.AdapterMovimentacao;
 import com.wrsistemas.organizationmoney.config.ConfiguracaoFirebase;
 import com.wrsistemas.organizationmoney.databinding.ActivityPrincipalBinding;
 import com.wrsistemas.organizationmoney.databinding.ContentPrincipalBinding;
 import com.wrsistemas.organizationmoney.databinding.FragmentFirstBinding;
 import com.wrsistemas.organizationmoney.helper.Base64Custon;
+import com.wrsistemas.organizationmoney.model.Movimentacao;
 import com.wrsistemas.organizationmoney.model.Usuario;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FirstFragment extends Fragment {
 
@@ -43,7 +48,7 @@ public class FirstFragment extends Fragment {
     private MaterialCalendarView calendarView;
     private TextView textoSaudacao;
     private TextView textoSaldo;
-    private RecyclerView recyclerMovimentacao;
+    private RecyclerView recyclerView;
     private Double despesaTotal = 0.0;
     private Double receitaTotal = 0.0;
     private Double resumoUsuario = 0.0;
@@ -52,6 +57,13 @@ public class FirstFragment extends Fragment {
     private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
     private DatabaseReference usuarioRef;
     private ValueEventListener valueEventListenerUsuario;
+    private ValueEventListener valueEventListenerMovimentacoes;
+    private AdapterMovimentacao adapterMovimentacao;
+    private List<Movimentacao> movimentacoes = new ArrayList<>();
+    private String mesAnoSelecionado;
+    private DatabaseReference movimetacaoRef;
+
+
 
 
 
@@ -71,23 +83,18 @@ public class FirstFragment extends Fragment {
         calendarView = getView().findViewById(R.id.calendarView);
         textoSaudacao = getView().findViewById(R.id.textSaudacao);
         textoSaldo = getView().findViewById(R.id.textSaldo);
-        recyclerMovimentacao = getView().findViewById(R.id.recyclerMovimentos);
-
+        recyclerView = getView().findViewById(R.id.recyclerMovimentos);
         configuraCalendarView();
 
+        //Configurar o adpter
+        adapterMovimentacao = new AdapterMovimentacao(movimentacoes, this);
 
-    }
+        //Configurar RecyclerView
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapterMovimentacao);
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        recuperarResumo();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
     }
 
     public void configuraCalendarView(){
@@ -95,9 +102,49 @@ public class FirstFragment extends Fragment {
         CharSequence meses[] = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
         calendarView.setTitleMonths(meses);
 
+        //Recuperar o mes/ano para o metodo recuperarMovimentacoes()
+        CalendarDay dataAtual = calendarView.getCurrentDate();
+        String mesSelecionado = String.format("%02d", (dataAtual.getMonth() + 1 ));
+        mesAnoSelecionado = String.valueOf(mesSelecionado + "" + dataAtual.getYear());
+
         calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
             @Override
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                String mesSelecionado = String.format("%02d", (date.getMonth() + 1 ));
+                mesAnoSelecionado = String.valueOf(mesSelecionado + "" + date.getYear());
+
+                //limpa as movimentações ao mudar o mes e só aparece as do mes selecionado
+                movimetacaoRef.removeEventListener(valueEventListenerMovimentacoes);
+                recuperarMovimentacoes();
+            }
+        });
+    }
+
+    public void recuperarMovimentacoes(){
+
+        String emailUsuario = autenticacao.getCurrentUser().getEmail();
+        String idUsuario = Base64Custon.codificarBase64(emailUsuario);
+        movimetacaoRef = firebaseRef.child("movimentacao")
+                                    .child(idUsuario)
+                                    .child(mesAnoSelecionado);
+
+        /*Log.i("dadosRetorno", "dados" + mesAnoSelecionado);*/
+
+        valueEventListenerMovimentacoes = movimetacaoRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                movimentacoes.clear();
+                for (DataSnapshot dados: snapshot.getChildren()){
+
+                    Movimentacao movimentacao = dados.getValue(Movimentacao.class);
+                    movimentacoes.add(movimentacao);
+                }
+
+                adapterMovimentacao.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
@@ -134,9 +181,23 @@ public class FirstFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        recuperarResumo();
+        recuperarMovimentacoes();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         Log.i("Evento", "Evento foi removido");
         usuarioRef.removeEventListener(valueEventListenerUsuario);
+        firebaseRef.removeEventListener(valueEventListenerMovimentacoes);
     }
 }
