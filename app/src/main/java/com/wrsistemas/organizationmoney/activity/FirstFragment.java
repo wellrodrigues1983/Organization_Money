@@ -1,15 +1,18 @@
 package com.wrsistemas.organizationmoney.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.ContentView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -17,6 +20,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,6 +64,7 @@ public class FirstFragment extends Fragment {
     private ValueEventListener valueEventListenerMovimentacoes;
     private AdapterMovimentacao adapterMovimentacao;
     private List<Movimentacao> movimentacoes = new ArrayList<>();
+    private Movimentacao movimentacao;
     private String mesAnoSelecionado;
     private DatabaseReference movimetacaoRef;
 
@@ -85,6 +90,7 @@ public class FirstFragment extends Fragment {
         textoSaldo = getView().findViewById(R.id.textSaldo);
         recyclerView = getView().findViewById(R.id.recyclerMovimentos);
         configuraCalendarView();
+        swipe();
 
         //Configurar o adpter
         adapterMovimentacao = new AdapterMovimentacao(movimentacoes, this);
@@ -95,6 +101,73 @@ public class FirstFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapterMovimentacao);
 
+    }
+
+    //Configurar Swipe
+    public void swipe(){
+        ItemTouchHelper.Callback itemTouch = new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+
+                int dragFlags = ItemTouchHelper.ACTION_STATE_IDLE; //inicia desligado
+                int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END; //Movimento do inicio para o fim
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                //Após ser arrastado os comandos colocados aqui são executados.
+                excluirMovimentacao(viewHolder);
+            }
+        };
+
+        new ItemTouchHelper(itemTouch).attachToRecyclerView(recyclerView);
+    }
+
+    public void excluirMovimentacao(RecyclerView.ViewHolder viewHolder){
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+
+        //Configura AlertDialog
+        alertDialog.setTitle("Excluir Movimentação da conta");
+        alertDialog.setMessage("Você tem certeza que deseja realmente excluir essa movimentação da sua conta?");
+        alertDialog.setCancelable(false);
+
+        alertDialog.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                int position = viewHolder.getAdapterPosition();
+                movimentacao = movimentacoes.get(position);//Recupera a movimentação
+
+                String emailUsuario = autenticacao.getCurrentUser().getEmail();
+                String idUsuario = Base64Custon.codificarBase64(emailUsuario);
+                movimetacaoRef = firebaseRef.child("movimentacao")
+                        .child(idUsuario)
+                        .child(mesAnoSelecionado);
+                movimetacaoRef.child(movimentacao.getKey()).removeValue(); // Remove a movimentação
+                adapterMovimentacao.notifyItemRemoved(position);
+                atulizarSaldo();
+
+                Toast.makeText(getContext(), "Movimentação excuida.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alertDialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getContext(), "Cancelado", Toast.LENGTH_SHORT).show();
+                adapterMovimentacao.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog alert = alertDialog.create();
+        alert.show();
     }
 
     public void configuraCalendarView(){
@@ -120,6 +193,24 @@ public class FirstFragment extends Fragment {
         });
     }
 
+    public void atulizarSaldo(){
+
+        String emailUsuario = autenticacao.getCurrentUser().getEmail();
+        String idUsuario = Base64Custon.codificarBase64(emailUsuario);
+        usuarioRef = firebaseRef.child("usuarios").child(idUsuario);
+
+        if (movimentacao.getTipo().equals("r")){
+            receitaTotal = receitaTotal - movimentacao.getValor();
+            usuarioRef.child("receitaTotal").setValue(receitaTotal);
+        }
+
+        if (movimentacao.getTipo().equals("d")){
+            despesaTotal = despesaTotal - movimentacao.getValor();
+            usuarioRef.child("despesaTotal").setValue(despesaTotal);
+        }
+
+    }
+
     public void recuperarMovimentacoes(){
 
         String emailUsuario = autenticacao.getCurrentUser().getEmail();
@@ -137,6 +228,7 @@ public class FirstFragment extends Fragment {
                 for (DataSnapshot dados: snapshot.getChildren()){
 
                     Movimentacao movimentacao = dados.getValue(Movimentacao.class);
+                    movimentacao.setKey(dados.getKey());
                     movimentacoes.add(movimentacao);
                 }
 
